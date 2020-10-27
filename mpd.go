@@ -137,6 +137,7 @@ func (m *MPD) Encode() ([]byte, error) {
 		}
 	}
 	res.WriteByte('\n')
+
 	return res.Bytes(), err
 }
 
@@ -178,6 +179,7 @@ type AdaptationSet struct {
 	MaxHeight               *uint64          `xml:"maxHeight,attr"`
 	MaxFrameRate            *string          `xml:"maxFrameRate,attr"`
 	Role                    *DescriptorType  `xml:"Role,omitempty"`
+	SegmentTemplate         *SegmentTemplate `xml:"SegmentTemplate,omitempty"`
 	Representations         []Representation `xml:"Representation,omitempty"`
 	Codecs                  *string          `xml:"codecs,attr"`
 }
@@ -198,6 +200,7 @@ type adaptationSetMarshal struct {
 	MaxHeight               *uint64                 `xml:"maxHeight,attr"`
 	MaxFrameRate            *string                 `xml:"maxFrameRate,attr"`
 	Role                    *DescriptorType         `xml:"Role,omitempty"`
+	SegmentTemplate         *SegmentTemplate        `xml:"SegmentTemplate,omitempty"`
 	Representations         []representationMarshal `xml:"Representation,omitempty"`
 	Codecs                  *string                 `xml:"codecs,attr"`
 }
@@ -261,12 +264,17 @@ type psshMarshal struct {
 
 // SegmentTemplate represents XSD's SegmentTemplateType.
 type SegmentTemplate struct {
-	Timescale              *uint64            `xml:"timescale,attr"`
-	Media                  *string            `xml:"media,attr"`
-	Initialization         *string            `xml:"initialization,attr"`
-	StartNumber            *uint64            `xml:"startNumber,attr"`
-	PresentationTimeOffset *uint64            `xml:"presentationTimeOffset,attr"`
-	SegmentTimelineS       []SegmentTimelineS `xml:"SegmentTimeline>S,omitempty"`
+	Timescale              *uint64          `xml:"timescale,attr"`
+	Media                  *string          `xml:"media,attr"`
+	Initialization         *string          `xml:"initialization,attr"`
+	Duration               *uint64          `xml:"duration,attr"`
+	StartNumber            *uint64          `xml:"startNumber,attr"`
+	PresentationTimeOffset *uint64          `xml:"presentationTimeOffset,attr"`
+	SegmentTimeline        *SegmentTimeline `xml:"SegmentTimeline,omitempty"`
+}
+
+type SegmentTimeline struct {
+	S []SegmentTimelineS `xml:"S,omitempty"`
 }
 
 // SegmentTimelineS represents XSD's SegmentTimelineType's inner S elements.
@@ -333,6 +341,7 @@ func modifyAdaptationSets(as []*AdaptationSet) []*adaptationSetMarshal {
 			SubsegmentAlignment:     a.SubsegmentAlignment,
 			SubsegmentStartsWithSAP: copyobj.UInt64(a.SubsegmentStartsWithSAP),
 			Role:                    copyDescriptorType(a.Role),
+			SegmentTemplate:         copySegmentTemplate(a.SegmentTemplate),
 			Representations:         modifyRepresentations(a.Representations),
 		}
 		asm = append(asm, adaptationSet)
@@ -380,15 +389,19 @@ func copySegmentTemplate(st *SegmentTemplate) *SegmentTemplate {
 		Timescale:              copyobj.UInt64(st.Timescale),
 		Media:                  copyobj.String(st.Media),
 		Initialization:         copyobj.String(st.Initialization),
+		Duration:               copyobj.UInt64(st.Duration),
 		StartNumber:            copyobj.UInt64(st.StartNumber),
 		PresentationTimeOffset: copyobj.UInt64(st.PresentationTimeOffset),
-		SegmentTimelineS:       copySegmentTimelineS(st.SegmentTimelineS),
+		SegmentTimeline:        copySegmentTimeline(st.SegmentTimeline),
 	}
 }
 
-func copySegmentTimelineS(st []SegmentTimelineS) []SegmentTimelineS {
-	stm := make([]SegmentTimelineS, 0, len(st))
-	for _, s := range st {
+func copySegmentTimeline(st *SegmentTimeline) *SegmentTimeline {
+	if st == nil || len(st.S) == 0 {
+		return nil
+	}
+	stm := make([]SegmentTimelineS, 0, len(st.S))
+	for _, s := range st.S {
 		segmentTimelineS := SegmentTimelineS{
 			T: s.T,
 			D: s.D,
@@ -396,7 +409,7 @@ func copySegmentTimelineS(st []SegmentTimelineS) []SegmentTimelineS {
 		}
 		stm = append(stm, segmentTimelineS)
 	}
-	return stm
+	return &SegmentTimeline{S: stm}
 }
 
 func modifyContentProtections(ds []Descriptor) []descriptorMarshal {
