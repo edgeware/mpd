@@ -80,7 +80,7 @@ func TestPeriodEqual(t *testing.T) {
 func TestAdaptationSetEqual(t *testing.T) {
 	mpd := &AdaptationSet{}
 	mpdM := &adaptationSetMarshal{}
-	require.Equal(t, 16, reflect.ValueOf(mpd).Elem().NumField(),
+	require.Equal(t, 18, reflect.ValueOf(mpd).Elem().NumField(),
 		"model was updated, need to update this test and function modifyAdaptationSets")
 	require.Equal(t, reflect.ValueOf(mpd).Elem().NumField(), reflect.ValueOf(mpdM).Elem().NumField(),
 		"AdaptationSet element count not equal adaptationSetMarshal")
@@ -97,7 +97,7 @@ func TestRepresentationEqual(t *testing.T) {
 
 func TestSegmentTemplateEqual(t *testing.T) {
 	a := &SegmentTemplate{}
-	require.Equal(t, 6, reflect.ValueOf(a).Elem().NumField(),
+	require.Equal(t, 7, reflect.ValueOf(a).Elem().NumField(),
 		"model was updated, need to update this test and function copySegmentTemplate")
 }
 
