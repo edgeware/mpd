@@ -171,6 +171,12 @@ type AdaptationSet struct {
 	SubsegmentAlignment     ConditionalUint  `xml:"subsegmentAlignment,attr"`
 	SubsegmentStartsWithSAP *uint64          `xml:"subsegmentStartsWithSAP,attr"`
 	Lang                    *string          `xml:"lang,attr"`
+	Par                     *string          `xml:"par,attr"`
+	MinWidth                *uint64          `xml:"minWidth,attr"`
+	MaxWidth                *uint64          `xml:"maxWidth,attr"`
+	MinHeight               *uint64          `xml:"minHeight,attr"`
+	MaxHeight               *uint64          `xml:"maxHeight,attr"`
+	MaxFrameRate            *string          `xml:"maxFrameRate,attr"`
 	Representations         []Representation `xml:"Representation,omitempty"`
 	Codecs                  *string          `xml:"codecs,attr"`
 }
@@ -184,6 +190,12 @@ type adaptationSetMarshal struct {
 	SubsegmentAlignment     ConditionalUint         `xml:"subsegmentAlignment,attr"`
 	SubsegmentStartsWithSAP *uint64                 `xml:"subsegmentStartsWithSAP,attr"`
 	Lang                    *string                 `xml:"lang,attr"`
+	Par                     *string                 `xml:"par,attr"`
+	MinWidth                *uint64                 `xml:"minWidth,attr"`
+	MaxWidth                *uint64                 `xml:"maxWidth,attr"`
+	MinHeight               *uint64                 `xml:"minHeight,attr"`
+	MaxHeight               *uint64                 `xml:"maxHeight,attr"`
+	MaxFrameRate            *string                 `xml:"maxFrameRate,attr"`
 	Representations         []representationMarshal `xml:"Representation,omitempty"`
 	Codecs                  *string                 `xml:"codecs,attr"`
 }
@@ -310,6 +322,12 @@ func modifyAdaptationSets(as []*AdaptationSet) []*adaptationSetMarshal {
 			MimeType:                a.MimeType,
 			SegmentAlignment:        a.SegmentAlignment,
 			StartWithSAP:            copyobj.UInt64(a.StartWithSAP),
+			Par:                     copyobj.String(a.Par),
+			MinWidth:                copyobj.UInt64(a.MinWidth),
+			MaxWidth:                copyobj.UInt64(a.MaxWidth),
+			MinHeight:               copyobj.UInt64(a.MinHeight),
+			MaxHeight:               copyobj.UInt64(a.MaxHeight),
+			MaxFrameRate:            copyobj.String(a.MaxFrameRate),
 			SubsegmentAlignment:     a.SubsegmentAlignment,
 			SubsegmentStartsWithSAP: copyobj.UInt64(a.SubsegmentStartsWithSAP),
 			Representations:         modifyRepresentations(a.Representations),
