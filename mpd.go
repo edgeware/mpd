@@ -188,29 +188,31 @@ type adaptationSetMarshal struct {
 
 // Representation represents XSD's RepresentationType.
 type Representation struct {
-	ID                 *string          `xml:"id,attr"`
-	Width              *uint64          `xml:"width,attr"`
-	Height             *uint64          `xml:"height,attr"`
-	SAR                *string          `xml:"sar,attr"`
-	FrameRate          *string          `xml:"frameRate,attr"`
-	Bandwidth          *uint64          `xml:"bandwidth,attr"`
-	AudioSamplingRate  *string          `xml:"audioSamplingRate,attr"`
-	Codecs             *string          `xml:"codecs,attr"`
-	ContentProtections []Descriptor     `xml:"ContentProtection,omitempty"`
-	SegmentTemplate    *SegmentTemplate `xml:"SegmentTemplate,omitempty"`
+	ID                        *string                    `xml:"id,attr"`
+	Width                     *uint64                    `xml:"width,attr"`
+	Height                    *uint64                    `xml:"height,attr"`
+	SAR                       *string                    `xml:"sar,attr"`
+	FrameRate                 *string                    `xml:"frameRate,attr"`
+	Bandwidth                 *uint64                    `xml:"bandwidth,attr"`
+	AudioSamplingRate         *string                    `xml:"audioSamplingRate,attr"`
+	Codecs                    *string                    `xml:"codecs,attr"`
+	ContentProtections        []Descriptor               `xml:"ContentProtection,omitempty"`
+	SegmentTemplate           *SegmentTemplate           `xml:"SegmentTemplate,omitempty"`
+	AudioChannelConfiguration *AudioChannelConfiguration `xml:"AudioChannelConfiguration,omitempty"`
 }
 
 type representationMarshal struct {
-	ID                 *string             `xml:"id,attr"`
-	Width              *uint64             `xml:"width,attr"`
-	Height             *uint64             `xml:"height,attr"`
-	SAR                *string             `xml:"sar,attr"`
-	FrameRate          *string             `xml:"frameRate,attr"`
-	Bandwidth          *uint64             `xml:"bandwidth,attr"`
-	AudioSamplingRate  *string             `xml:"audioSamplingRate,attr"`
-	Codecs             *string             `xml:"codecs,attr"`
-	ContentProtections []descriptorMarshal `xml:"ContentProtection,omitempty"`
-	SegmentTemplate    *SegmentTemplate    `xml:"SegmentTemplate,omitempty"`
+	ID                        *string                    `xml:"id,attr"`
+	Width                     *uint64                    `xml:"width,attr"`
+	Height                    *uint64                    `xml:"height,attr"`
+	SAR                       *string                    `xml:"sar,attr"`
+	FrameRate                 *string                    `xml:"frameRate,attr"`
+	Bandwidth                 *uint64                    `xml:"bandwidth,attr"`
+	AudioSamplingRate         *string                    `xml:"audioSamplingRate,attr"`
+	Codecs                    *string                    `xml:"codecs,attr"`
+	ContentProtections        []descriptorMarshal        `xml:"ContentProtection,omitempty"`
+	SegmentTemplate           *SegmentTemplate           `xml:"SegmentTemplate,omitempty"`
+	AudioChannelConfiguration *AudioChannelConfiguration `xml:"AudioChannelConfiguration,omitempty"`
 }
 
 // Descriptor represents XSD's DescriptorType.
@@ -318,20 +320,31 @@ func modifyRepresentations(rs []Representation) []representationMarshal {
 	rsm := make([]representationMarshal, 0, len(rs))
 	for _, r := range rs {
 		representation := representationMarshal{
-			AudioSamplingRate:  copyobj.String(r.AudioSamplingRate),
-			Bandwidth:          copyobj.UInt64(r.Bandwidth),
-			Codecs:             copyobj.String(r.Codecs),
-			FrameRate:          copyobj.String(r.FrameRate),
-			Height:             copyobj.UInt64(r.Height),
-			ID:                 copyobj.String(r.ID),
-			Width:              copyobj.UInt64(r.Width),
-			SegmentTemplate:    copySegmentTemplate(r.SegmentTemplate),
-			SAR:                copyobj.String(r.SAR),
-			ContentProtections: modifyContentProtections(r.ContentProtections),
+			AudioSamplingRate:         copyobj.String(r.AudioSamplingRate),
+			Bandwidth:                 copyobj.UInt64(r.Bandwidth),
+			Codecs:                    copyobj.String(r.Codecs),
+			FrameRate:                 copyobj.String(r.FrameRate),
+			Height:                    copyobj.UInt64(r.Height),
+			ID:                        copyobj.String(r.ID),
+			Width:                     copyobj.UInt64(r.Width),
+			SegmentTemplate:           copySegmentTemplate(r.SegmentTemplate),
+			SAR:                       copyobj.String(r.SAR),
+			ContentProtections:        modifyContentProtections(r.ContentProtections),
+			AudioChannelConfiguration: copyAudioChannelConfiguration(r.AudioChannelConfiguration),
 		}
 		rsm = append(rsm, representation)
 	}
 	return rsm
+}
+
+func copyAudioChannelConfiguration(acc *AudioChannelConfiguration) *AudioChannelConfiguration {
+	if acc == nil {
+		return nil
+	}
+	return &AudioChannelConfiguration{
+		SchemeIDURI: copyobj.String(acc.SchemeIDURI),
+		Value:       copyobj.String(acc.Value),
+	}
 }
 
 func copySegmentTemplate(st *SegmentTemplate) *SegmentTemplate {
@@ -384,4 +397,10 @@ func modifyPssh(p *Pssh) *psshMarshal {
 		Cenc:  copyobj.String(p.Cenc),
 		Value: copyobj.String(p.Value),
 	}
+}
+
+// AudioChannelConfiguration represents XSD's AudioChannelConfiguration type.
+type AudioChannelConfiguration struct {
+	SchemeIDURI *string `xml:"schemeIdUri,attr"`
+	Value       *string `xml:"value,attr,omitempty"`
 }
