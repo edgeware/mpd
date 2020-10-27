@@ -1,6 +1,7 @@
 package mpd
 
 import (
+	"fmt"
 	"io/ioutil"
 	"reflect"
 	"strings"
@@ -17,6 +18,7 @@ type MPDSuite struct{}
 var _ = Suite(&MPDSuite{})
 
 func testUnmarshalMarshal(c *C, name string) {
+	fmt.Println(name)
 	expected, err := ioutil.ReadFile(name)
 	c.Assert(err, IsNil)
 
@@ -51,6 +53,10 @@ func (s *MPDSuite) TestUnmarshalMarshalLive(c *C) {
 
 func (s *MPDSuite) TestUnmarshalMarshalLiveDelta161(c *C) {
 	testUnmarshalMarshal(c, "fixture_elemental_delta_vod_multi_drm.mpd")
+}
+
+func (s *MPDSuite) TestUnmarshalMarshalLiveSimVod(c *C) {
+	testUnmarshalMarshal(c, "fixture_livesim_vod.mpd")
 }
 
 func TestMPDEqual(t *testing.T) {
