@@ -56,7 +56,7 @@ func (s *MPDSuite) TestUnmarshalMarshalLiveDelta161(c *C) {
 func TestMPDEqual(t *testing.T) {
 	mpd := &MPD{}
 	mpdM := &mpdMarshal{}
-	require.Equal(t, 16, reflect.ValueOf(mpd).Elem().NumField(),
+	require.Equal(t, 17, reflect.ValueOf(mpd).Elem().NumField(),
 		"model was updated, need to update this test and function modifyMPD")
 	require.Equal(t, reflect.ValueOf(mpd).Elem().NumField(), reflect.ValueOf(mpdM).Elem().NumField(),
 		"MPD element count not equal mpdMarshal")
